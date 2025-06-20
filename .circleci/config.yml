@@ -20,14 +20,14 @@ jobs:
 
       - run:
           name: Tag Docker image
-          command: docker tag simple-node vishnu125/simple-node:latest
+          command: docker tag simple-node vishnu125/simple-node-vv:latest
 
       - run:
           name: Push to Docker Hub
           command: |
             echo "Docker username: $DOCKER_USER"
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
-            docker push vishnu125/simple-node:latest
+            docker push vishnu125/simple-node-vv:latest
 
 workflows:
   version: 2
