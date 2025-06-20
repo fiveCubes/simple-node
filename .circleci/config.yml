@@ -25,6 +25,7 @@ jobs:
       - run:
           name: Push to Docker Hub
           command: |
+            echo "Docker username: $DOCKER_USER"
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
             docker push vishnu125/simple-node:latest
 
