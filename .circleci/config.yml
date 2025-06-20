@@ -1,32 +1,36 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:.
 version: 2.1
-orbs:
-  node: circleci/node@5
+
 jobs:
-  test-node:
-    # Install node dependencies and run tests
-    executor: node/default
+  build:
+    docker:
+      - image: cimg/node:13.14  # Node.js 13 with Docker preinstalled
+    working_directory: ~/app
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
+
+      - setup_remote_docker:
+          version: 20.10.14
+
       - run:
-          name: Run tests
-          command: echo \"No test specified in package.json\"
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
-    steps:
-      # Replace this with steps to deploy to users
+          name: Print Docker version
+          command: docker --version
+
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: Build Docker image
+          command: docker build -t simple-node .
+
+      - run:
+          name: Tag Docker image
+          command: docker tag simple-node vishnu125/simple-node:latest
+
+      - run:
+          name: Push to Docker Hub
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+            docker push vishnu125/simple-node:latest
+
 workflows:
-  build-and-test:
+  version: 2
+  build_and_push:
     jobs:
-      - test-node
-    # - deploy:
-    #     requires:
-    #       - test-node
+      - build
