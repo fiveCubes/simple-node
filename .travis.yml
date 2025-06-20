@@ -1,23 +1,36 @@
-language: node_js
-node_js:
-  - 13
+version: 2.1
 
-services:
-  - docker
+jobs:
+  build:
+    docker:
+      - image: cimg/node:13.14  # Node.js 13 with Docker preinstalled
+    working_directory: ~/app
+    steps:
+      - checkout
 
-# Pre-testing installs
-install:
-  - echo "nothing needs to be installed"
+      - setup_remote_docker:
+          version: 20.10.14
 
-# Scripts to be run such as tests
-before_script:
-  - echo "no tests"
+      - run:
+          name: Print Docker version
+          command: docker --version
 
-script:
-  - docker --version # print the version for logging
-  - docker build -t simple-node .
-  - docker tag simple-node YOUR_DOCKER_HUB/simple-node:latest
+      - run:
+          name: Build Docker image
+          command: docker build -t simple-node .
 
-after_success:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push YOUR_DOCKER_HUB/simple-node
+      - run:
+          name: Tag Docker image
+          command: docker tag simple-node vishnu125/simple-node:latest
+
+      - run:
+          name: Push to Docker Hub
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+            docker push vishnu125/simple-node:latest
+
+workflows:
+  version: 2
+  build_and_push:
+    jobs:
+      - build
